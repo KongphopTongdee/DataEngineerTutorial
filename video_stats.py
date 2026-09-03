@@ -13,7 +13,10 @@ import requests
 import json
 
 import os 
+
 from dotenv import load_dotenv
+
+from datetime import date
 
 ########################################################
 #
@@ -141,6 +144,12 @@ def extract_video_data( video_ids ):
     except requests.exceptions.RequestException as e:
         raise e
 
+def save_to_json( extracted_data ):
+    file_path = f"./data/YT_data_{date.today()}.json"
+
+    with open( file_path, "w", encoding="utf-8" ) as json_outfile:
+        json.dump( extracted_data, json_outfile, indent=4, ensure_ascii=False )
+
 ########################################################
 #
 #	EXCEPTION DEFINITIONS
@@ -156,7 +165,8 @@ def extract_video_data( video_ids ):
 def main():
     playlistID = get_playlist_ID()
     videoIDs = get_video_ids( playlistID )
-    print( extract_video_data( videoIDs )  )
+    video_data = extract_video_data( videoIDs )
+    save_to_json( video_data )
 
 if __name__ == '__main__':
     main()

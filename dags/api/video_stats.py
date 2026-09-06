@@ -12,27 +12,36 @@ import requests
 
 import json
 
-import os 
-
-from dotenv import load_dotenv
-
 from datetime import date
+
+# -Load from the locals laptop
+# import os 
+# from dotenv import load_dotenv
+
+# -Load from the docker container( In the real production, no Airflow imports, use on the top function )
+from airflow.decorators import task
+from airflow.models import Variable
 
 ########################################################
 #
 #	LOCAL IMPORTS
 #
 
-load_dotenv(dotenv_path="./.env")
+# -Load from the locals laptop
+# load_dotenv(dotenv_path="./.env")
 
 ########################################################
 #
 #	GLOBALS
 #
 
-API_KEY = os.getenv("API_KEY")
+# -Load from the locals laptop
+# API_KEY = os.getenv("API_KEY")
+# CHANNEL_HANDLE = "MrBeast"
 
-CHANNEL_HANDLE = "MrBeast"
+# -Load from the docker container ( In the real production, no Airflow imports, use on the top function )
+API_KEY = Variable.get("API_KEY")
+CHANNEL_HANDLE = Variable.get("CHANNEL_HANDLE")
 
 maxResult = 50
 
@@ -41,11 +50,15 @@ maxResult = 50
 #	HELPER FUNCTIONS
 #
 
+# ( In the real production, no Airflow imports )
+@task
 def convertPythonToJson( data ):
     dataToJson = data.json()
     answer = json.dumps( dataToJson, indent=4 )
     return answer
 
+# ( In the real production, no Airflow imports )
+@task
 def get_playlist_ID():
     url = f"https://youtube.googleapis.com/youtube/v3/channels?part=contentDetails&forHandle={CHANNEL_HANDLE}&key={API_KEY}"
 
@@ -65,7 +78,9 @@ def get_playlist_ID():
         return channel_playlistID
     except requests.exceptions.RequestException as e:
         raise e
- 
+
+# ( In the real production, no Airflow imports )
+@task
 def get_video_ids( playlistID ):
     base_url = f"https://youtube.googleapis.com/youtube/v3/playlistItems?part=contentDetails&maxResults={maxResult}&playlistId={ playlistID }&key={API_KEY}"
 
@@ -100,6 +115,8 @@ def get_video_ids( playlistID ):
     except requests.exceptions.RequestException as e:
         raise e
 
+# ( In the real production, no Airflow imports )
+@task
 def extract_video_data( video_ids ):
     extracted_data = []
 
@@ -144,6 +161,8 @@ def extract_video_data( video_ids ):
     except requests.exceptions.RequestException as e:
         raise e
 
+# ( In the real production, no Airflow imports )
+@task
 def save_to_json( extracted_data ):
     file_path = f"./data/YT_data_{date.today()}.json"
 

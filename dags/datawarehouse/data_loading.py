@@ -33,7 +33,7 @@ logger = logging.getLogger( __name__ )
 #	HELPER FUNCTIONS
 #
 
-def load_path():
+def load_data():
     file_path = f"./data/YT_data_{date.today()}"
     try:
         logger.info( f"Processing file: YT_data_{ date.today() }" )

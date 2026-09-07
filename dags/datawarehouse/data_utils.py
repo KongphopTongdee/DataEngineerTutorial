@@ -75,7 +75,7 @@ def create_table( schema ):
                     "Comments_Count" INT
                 );
             """
-    cur.excute( table_sql )
+    cur.execute( table_sql )
     conn.commit()
     close_conn_cursor()
 

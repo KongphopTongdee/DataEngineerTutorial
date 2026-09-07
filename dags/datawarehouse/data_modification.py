@@ -35,7 +35,7 @@ def insert_rows( cur, conn, schema, row ):
     try:
         if schema == "staging":
             video_id = "video_id"
-            cur.excute(
+            cur.execute(
                 f"""
                     INSERT INTO {schema}.{table}("Video_ID", "Video_Title", "Upload_Date", "Duration", "Video_Views", "Likes_Count", "Comments_Count")
                     VALUES (%(video_id)s, %(title)s, %(publishedAt)s, %(duration)s, %(viewCount)s, %(likeCount)s, %(commentCount)s);

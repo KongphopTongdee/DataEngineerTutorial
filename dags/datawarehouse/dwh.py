@@ -40,6 +40,7 @@ table = "yt_api"
 #	HELPER FUNCTIONS
 #
 
+@task
 def staging_table():
     schema = "staging"
     conn, cur = None, None

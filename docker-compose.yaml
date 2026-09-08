@@ -93,6 +93,8 @@ x-airflow-common:
     POSTGRES_CONN_PORT: ${POSTGRES_CONN_PORT}
   volumes:
     - ./config:/opt/airflow/config
+    # Disables the Airflow UI login prompt - grants every visitor the Admin role
+    - ./config/webserver_config.py:/opt/airflow/webserver_config.py
     - ./dags:/opt/airflow/dags
     - ./data:/opt/airflow/data
     - ./include:/opt/airflow/include

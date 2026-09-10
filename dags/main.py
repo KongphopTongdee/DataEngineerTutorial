@@ -23,6 +23,8 @@ from api.video_stats import get_playlist_ID, get_video_ids, extract_video_data, 
 
 from datawarehouse.dwh import staging_table, core_table
 
+from dataquality.soda import yt_elt_data_quality
+
 ########################################################
 #
 #	GLOBALS
@@ -30,6 +32,10 @@ from datawarehouse.dwh import staging_table, core_table
 
 # Define the local timezone
 local_tz = pendulum.timezone("Asia/Bangkok")
+
+# Variables
+staging_schema = "staging"
+core_schema = "core"
 
 # Default Args
 default_args = {
@@ -42,7 +48,7 @@ default_args = {
     # 'retry_delay': timedelta(minutes=5),
     "max_active_runs": 1,
     "dagrun_timeout": timedelta(hours=1),
-    "start_date": datetime(2026, 9, 6, tzinfo=local_tz),
+    "start_date": datetime(2026, 9, 9, tzinfo=local_tz),
     # 'end_date': datetime(2030, 12, 31, tzinfo=local_tz),
 }
 
@@ -96,3 +102,18 @@ with DAG(
 
     # Define dependencies
     update_staging >> update_core
+
+with DAG(
+    dag_id="data_quality",
+    default_args = default_args,
+    description = "DAG to check the data quality on both layers in the db",
+    schedule="0 16 * * *",
+    catchup=False
+) as dag:
+
+    # Define tasks
+    soda_validate_staging = yt_elt_data_quality( staging_schema )
+    soda_validate_core = yt_elt_data_quality( core_schema )
+
+    # Define dependencies
+    soda_validate_staging >> soda_validate_core

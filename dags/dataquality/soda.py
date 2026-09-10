@@ -8,11 +8,9 @@
 #	STANDARD IMPORTS
 #
 
-import json
-
-from datetime import date
-
 import logging
+
+from airflow.operators.bash import BashOperator
 
 ########################################################
 #
@@ -28,26 +26,26 @@ import logging
 
 logger = logging.getLogger( __name__ )
 
+SODA_PATH = "/opt/airflow/include/soda"
+
+DATASOURCE = "pg_datasource"
+
 ########################################################
 #
 #	HELPER FUNCTIONS
 #
 
-def load_data():
-    file_path = f"./data/YT_data_{date.today()}.json"
+
+def yt_elt_data_quality( schema ):
     try:
-        logger.info( f"Processing file: YT_data_{date.today()}" )
-
-        with open( file_path, "r", encoding="utf-8" ) as raw_data:
-            data = json.load( raw_data )
-
-        return data
-    except FileNotFoundError:
-        logger.error( f"File not found:{file_path}" )
-        raise
-    except json.JSONDecodeError:
-        logger.error( f"Invalid JSON in file: {file_path}" )
-        raise
+        task = BashOperator(
+            task_id = f"soda_test_{schema}",
+            bash_command = f"soda scan -d {DATASOURCE} -c {SODA_PATH}/configuration.yml -v SCHEMA={schema} {SODA_PATH}/checks.yml",
+        )
+        return task
+    except Exception as e:
+        logger.error( f"Error running data quality check for schema: {schema}" )
+        raise e
 
 ########################################################
 #

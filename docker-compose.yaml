@@ -55,6 +55,7 @@ x-airflow-common:
   # Use the .env file to read the connection params and variables - SWITCH THIS OFF WHEN USING GITHUB ACTIONS
   # env_file:
   #   - .env
+
   environment:
     &airflow-common-env
     # Set executor to CeleryExecutor 
@@ -114,9 +115,11 @@ services:
   postgres:
     container_name: postgres
     image: postgres:13
+
     # Use the .env file to read the connection params - SWITCH THIS OFF WHEN USING GITHUB ACTIONS
     # env_file:
     #   - .env
+    
     # Env vars after POSTGRES_PASSWORD are needed for CI-CD workflow - SWITCH THIS ALL ON WHEN USING GITHUB ACTIONS
     environment:
       - POSTGRES_USER=${POSTGRES_CONN_USERNAME}
